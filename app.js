@@ -1,46 +1,32 @@
-
-
-
 const express = require('express');
+const loadtest = require('loadtest');
+const loadTestOptions = require('./payload.json');
 
 const app = express();
+let counter = 0;
 
-const env = process.env.NODE_ENV || 'development';
-app.locals.ENV = env;
-app.locals.ENV_DEVELOPMENT = env == 'development';
+app.set('port', process.env.PORT || 3000);
 
-
-/// catch 404 and forward to error handler
-app.use((req, res, next) => {
-    const err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
-/// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use((err, req, res, next) => {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err,
-            title: 'error'
-        });
-    });
+function statusCallback(error, result, latency) {
+  counter = counter + 1;
+  console.log(counter + ' of ' +  loadTestOptions.maxRequests + ' requests completed')
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use((err, req, res, next) => {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {},
-        title: 'error'
-    });
+let server = app.listen(app.get('port'), function () {
+  console.log('Load test starting up...');
+  // loadTestOptions.statusCallback = statusCallback;
+
+  loadtest.loadTest(loadTestOptions, function (error, result) {
+    if (error) return console.error('Got an error: %s', error);
+
+    console.log('Load test complete...');
+    console.log();
+    console.log('Load test results', result);
+    console.log();
+    console.log('Stopping server...');
+
+    process.exit(0);
+  });
 });
 
 module.exports = app;
