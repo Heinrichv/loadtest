@@ -1,6 +1,3 @@
 {
-  "url": "www.google.com",
-  "maxRequests": 1000,
-  "method": "GET",
-  "contentType": "text/html"
+  
 }

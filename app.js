@@ -3,19 +3,10 @@ const loadtest = require('loadtest');
 const loadTestOptions = require('./payload.json');
 
 const app = express();
-let counter = 0;
-
-app.set('port', process.env.PORT || 3000);
-
-function statusCallback(error, result, latency) {
-  counter = counter + 1;
-  console.log(counter + ' of ' +  loadTestOptions.maxRequests + ' requests completed')
-}
+app.set('port', 3000);
 
 let server = app.listen(app.get('port'), function () {
   console.log('Load test starting up...');
-  // loadTestOptions.statusCallback = statusCallback;
-
   loadtest.loadTest(loadTestOptions, function (error, result) {
     if (error) return console.error('Got an error: %s', error);
 
@@ -27,6 +18,7 @@ let server = app.listen(app.get('port'), function () {
 
     process.exit(0);
   });
+
 });
 
 module.exports = app;
